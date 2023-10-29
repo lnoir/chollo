@@ -7,8 +7,6 @@ import { JobAgent } from '../../agents/job.agent';
 import { AllFilters, defaultFilterCriteria, defaultMatchFilterFn } from './filters';
 import { MatchFilterFn } from './types';
 
-jest.setTimeout(120000);
-
 const agents = {
   'job': JobAgent
 };
