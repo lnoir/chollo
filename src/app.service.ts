@@ -82,7 +82,7 @@ export class AppService {
   }
 
   async sequentialChain({job, skills}) {
-    return await runJobSkillMatchingAgent({job, skills});
+    return await runJobSkillMatchingAgent({doc: job, params: skills});
   }
 
   async abort() {
