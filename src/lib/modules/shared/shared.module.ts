@@ -8,9 +8,15 @@ import { Doc } from '../docs/entities/doc.entity';
 import { TaskScheduled } from '../tasks/entities/task-scheduled.entity';
 import { TaskActive } from '../tasks/entities/task-active.entity';
 import { TaskLogged } from '../tasks/entities/task-logged.entity';
+import { ConfigModule } from '@nestjs/config';
+import appConfig from '../../../app.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ 
+      ignoreEnvVars: false,
+      load: [appConfig]
+    }),
     TypeOrmModule.forFeature([
       DocSource, DocFormat, DocConfig, Doc, TaskScheduled, TaskActive, TaskLogged
     ]),

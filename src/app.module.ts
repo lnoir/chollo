@@ -15,6 +15,10 @@ import { TaskActive } from './lib/modules/tasks/entities/task-active.entity';
 import { TaskLogged } from './lib/modules/tasks/entities/task-logged.entity';
 import { TaskOutput } from './lib/modules/tasks/entities/task-output.entity';
 import { TaskStep } from './lib/modules/tasks/entities/task-step.entity';
+import { QueueModule } from './lib/modules/queue/queue.module';
+import { Job } from './lib/modules/queue/entities/job.entity';
+import { WorkerModule } from './lib/modules/worker/worker.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -26,11 +30,22 @@ import { TaskStep } from './lib/modules/tasks/entities/task-step.entity';
       ],
       synchronize: true,
     }),
+    TypeOrmModule.forRoot({
+      name: 'queue',
+      type: 'sqlite',
+      database: 'cholloq.db',
+      entities: [
+        Job
+      ],
+      synchronize: true,
+    }),
     DocsModule,
     TasksModule,
     SharedModule,
+    QueueModule,
+    WorkerModule,
   ],
   controllers: [AppController],
-  providers: [AppService, DocsService],
+  providers: [AppService, DocsService, ClientsModule],
 })
 export class AppModule {}
