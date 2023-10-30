@@ -1,4 +1,4 @@
-import { ConfidenceValue, GenericMatchDoc, MatchFilterCriteria, MatchFilterFn } from "./types";
+import { ConfidenceValue, GenericMatchDoc, MatchFilterCriteria, MatchFilterFn } from "./tasks.types";
 
 export const confidenceMap = {
   'low': 0,

@@ -14,9 +14,27 @@ import { TaskStep } from '../tasks/entities/task-step.entity';
 import { TaskOutput } from '../tasks/entities/task-output.entity';
 import { ConfigModule } from '@nestjs/config';
 import { WorkerController } from './worker.controller';
+import workerConfig from './worker.config';
+import { QueueModule } from '../queue/queue.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { MAIN_SERVICE } from '../../../constants';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ 
+      ignoreEnvVars: false,
+      load: [workerConfig]
+    }),
+    ClientsModule.register([
+      {
+        name: MAIN_SERVICE,
+        transport: Transport.TCP,
+        options: {
+          host: 'localhost',
+          port: 3000,
+        }
+      }
+    ]),
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'chollo.db',
@@ -34,7 +52,8 @@ import { WorkerController } from './worker.controller';
       ],
       synchronize: true,
     }),
-    TasksModule
+    TasksModule,
+    QueueModule
   ],
   providers: [WorkerService],
   controllers: [WorkerController]

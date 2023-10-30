@@ -8,8 +8,8 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start:dev:worker": "CHOLLO_SERVICE=worker nest start --watch --entryFile src/worker.js",
-    "start:dev:main": "CHOLLO_SERVICE=main nest start --watch",
+    "start:dev:worker": "CHOLLO_SERVICE=WORKER_SERVICE nest start --watch --entryFile src/worker.js",
+    "start:dev:main": "CHOLLO_SERVICE=MAIN_SERVICE nest start --watch",
     "start:dev:all": "concurrently \"npm run start:dev:worker\" \"npm run start:dev:main\"",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

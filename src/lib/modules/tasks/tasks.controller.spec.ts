@@ -1,18 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TasksController } from './tasks.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DocSource } from '../docs/entities/doc-source.entity';
-import { DocFormat } from '../docs/entities/doc-format.entity';
-import { DocConfig } from '../docs/entities/doc-config.entity';
-import { Doc } from '../docs/entities/doc.entity';
-import { TaskScheduled } from './entities/task-scheduled.entity';
-import { TaskActive } from './entities/task-active.entity';
-import { TaskLogged } from './entities/task-logged.entity';
 import { SharedModule } from '../shared/shared.module';
 import { DocsModule } from '../docs/docs.module';
 import { TasksService } from './tasks.service';
 import { DocsService } from '../docs/docs.service';
 import { setupTestDocs } from '../../../../test/helpers';
+import { testTypeOrmImportMain } from '../../../../test/pre-configured.imports';
 
 jest.setTimeout(120000);
 
@@ -23,14 +16,8 @@ describe('TasksController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
+        testTypeOrmImportMain,
         SharedModule,
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [DocSource, DocFormat, DocConfig, Doc, TaskScheduled, TaskActive, TaskLogged],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([DocSource, DocFormat, DocConfig, Doc]),
         DocsModule,
       ],
       controllers: [TasksController],
@@ -55,7 +42,7 @@ describe('TasksController', () => {
       scheduled: scheduled.toISOString()
     });
     expect(task).toBeTruthy();
-    expect(task.constructor.name).toBe('ScheduledTask');
+    expect(task.constructor.name).toBe('TaskScheduled');
     expect(task).toHaveProperty('id');
   });
 

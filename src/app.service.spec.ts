@@ -10,7 +10,7 @@ import { runCoverLetterWriterAgent } from './lib/agents/job.agent';
 import { cv0 } from '../test/cvs/cv0';
 import { relativeToAbsoluteUrl } from './lib/utils/string.utils';
 import { defaultMatchFilterFn } from './lib/modules/tasks/filters';
-import { MatchFilterCriteria } from './lib/modules/tasks/types';
+import { MatchFilterCriteria } from './lib/modules/tasks/tasks.types';
 
 
 // @TODO: serve local versions of the pages we're testing against.

@@ -1,5 +1,5 @@
 import { defaultFilterCriteria, defaultMatchFilterFn } from "./filters";
-import { MatchFilterCriteria } from "./types";
+import { MatchFilterCriteria } from "./tasks.types";
 
 describe('Filters', () => {
 

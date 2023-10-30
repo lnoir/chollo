@@ -3,7 +3,7 @@ import { HtmlDocumentLoader } from './html-document.loader';
 
 jest.setTimeout(30000);
 
-fdescribe('HtmlDocumentLoader', () => {
+describe('HtmlDocumentLoader', () => {
   it('transformHtmlToDocs should transform some html to a doc', async () => {
     const options = {
       selector: 'article',

@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsString, IsNumber } from 'class-validator';
+import { IsEnum, IsString, IsNumber, IsOptional } from 'class-validator';
 import { DocConfigDto } from './doc-config.dto';
 
 export class DocFormatDto {
@@ -17,7 +17,8 @@ export class DocFormatDto {
   
   @ApiProperty({ description: 'The agent to handle this doc format.' })
   @IsString()
-  agent: string;
+  @IsOptional()
+  agent?: string;
 
   @ApiProperty({ description: 'The source of the doc format (a reference to the `DocSource` entity).' })
   @IsNumber()

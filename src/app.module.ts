@@ -17,8 +17,7 @@ import { TaskOutput } from './lib/modules/tasks/entities/task-output.entity';
 import { TaskStep } from './lib/modules/tasks/entities/task-step.entity';
 import { QueueModule } from './lib/modules/queue/queue.module';
 import { Job } from './lib/modules/queue/entities/job.entity';
-import { WorkerModule } from './lib/modules/worker/worker.module';
-import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientsModule } from '@nestjs/microservices';
 
 @Module({
   imports: [
@@ -43,7 +42,6 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
     TasksModule,
     SharedModule,
     QueueModule,
-    WorkerModule,
   ],
   controllers: [AppController],
   providers: [AppService, DocsService, ClientsModule],

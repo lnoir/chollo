@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { QueueService } from './queue.service';
+import { QueueController } from './queue.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Job, JobStatus } from './entities/job.entity';
-import { QueueModule } from './queue.module';
 import { mainEntities } from '../../../../test/helpers';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { WORKER_SERVICE } from '../../../constants';
+import { Job } from './entities/job.entity';
+import { QueueService } from './queue.service';
 
-describe('QueueService', () => {
-  let queueService: QueueService;
+describe('QueueController', () => {
+  let controller: QueueController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,26 +39,14 @@ describe('QueueService', () => {
           }
         ])
       ],
+      controllers: [QueueController],
       providers: [QueueService],
     }).compile();
 
-    queueService = module.get<QueueService>(QueueService);
+    controller = module.get<QueueController>(QueueController);
   });
 
   it('should be defined', () => {
-    expect(queueService).toBeDefined();
-  });
-
-  it('should create a new job', async () => {
-    await queueService.addJob({
-      name: '@test',
-      task: 1,
-      priority: 0
-    });
-
-    const jobs = await queueService.fetchJobsByStatus(JobStatus.QUEUED);
-    expect(jobs).toBeTruthy();
-    expect(jobs).toHaveLength(1);
-    await queueService.deleteJob(jobs[0].id);
+    expect(controller).toBeDefined();
   });
 });

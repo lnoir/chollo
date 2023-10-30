@@ -1,5 +1,18 @@
-import { DocsService } from "src/lib/modules/docs/docs.service";
-import { TasksService } from "src/lib/modules/tasks/tasks.service";
+import { DocsService } from "../src/lib/modules/docs/docs.service";
+import { TasksService } from "../src/lib/modules/tasks/tasks.service";
+import { DocSource } from '../src/lib/modules/docs/entities/doc-source.entity';
+import { DocFormat } from '../src/lib/modules/docs/entities/doc-format.entity';
+import { DocConfig } from '../src/lib/modules/docs/entities/doc-config.entity';
+import { Doc } from '../src/lib/modules/docs/entities/doc.entity';
+import { TaskScheduled } from '../src/lib/modules/tasks/entities/task-scheduled.entity';
+import { TaskStep } from '../src/lib/modules/tasks/entities/task-step.entity';
+import { TaskActive } from '../src/lib/modules/tasks/entities/task-active.entity';
+import { TaskLogged } from '../src/lib/modules/tasks/entities/task-logged.entity';
+import { TaskOutput } from '../src/lib/modules/tasks/entities/task-output.entity';
+
+export const mainEntities = [
+  DocSource, DocFormat, DocConfig, Doc, TaskScheduled, TaskStep, TaskActive, TaskLogged, TaskOutput
+];
 
 export const staticTestHost = 'http://127.0.0.1:7878';
 

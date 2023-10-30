@@ -4,8 +4,7 @@ import { DocsService } from '../docs/docs.service';
 import { TaskScheduled } from './entities/task-scheduled.entity';
 import { TasksService } from './tasks.service';
 import { JobAgent } from '../../agents/job.agent';
-import { AllFilters, defaultFilterCriteria, defaultMatchFilterFn } from './filters';
-import { MatchFilterFn } from './types';
+import { AllFilters } from './filters';
 
 const agents = {
   'job': JobAgent
@@ -18,18 +17,31 @@ const confidenceMap = {
 };
 
 @Injectable()
-export class Runner {
+export class RunnerFactory {
 
   constructor(
     private readonly docsService: DocsService,
     private readonly tasksService: TasksService
   ) {}
 
+  getNewRunner(): Runner {
+    return new Runner(this.docsService, this.tasksService);
+  }
+}
+
+class Runner {
+
   retrievers = {
     web: {
       html: HtmlDocumentLoader,
     }
   }
+
+  constructor(
+    private readonly docsService: DocsService,
+    private readonly tasksService: TasksService
+  ) {}
+  
 
   private getRetriever(task: TaskScheduled) {
     if (
@@ -75,7 +87,7 @@ export class Runner {
 
   private async applyFilters({docs, filters}) {
     if (!filters?.length) return docs;
-    return await filters.reduce(async (accp: Promise<any>, filter) => {
+    return await filters.reduce(async (accp: Promise<Record<string, any>>, filter) => {
       const acc = await accp;
       if (!filter?.name) return acc;
       const { name, criteria: filterCriteria } = filter;
@@ -88,29 +100,35 @@ export class Runner {
     }, Promise.resolve(docs));
   }
 
-  async run(taskId: number) {
+  async run(taskId: number): Promise<object[]> {
     const { task, retriever, location } = await this.prepareRun(taskId);
     const docs = await retriever.load();
-    expect(docs).toHaveLength(24);
     
-    let enriched: any;
+    let enriched: object[];
 
     for (const step of task.steps) {
-      const agent = agents[step.agent];
-      if (!agent) throw new Error(`Invalid agent: '${agent}'`);
-      const skillFn = agent[step.skill];
-      if (!skillFn) throw new Error(`Invalid skill: '${skillFn}'`);
+      try {
+        const agent = agents[step.agent];
+        if (!agent) throw new Error(`Invalid agent: '${agent}'`);
+        const skillFn = agent[step.skill];
+        if (!skillFn) throw new Error(`Invalid skill: '${skillFn}'`);
 
-      enriched = await this.applySkill({
-        task,
-        docs: enriched || docs,
-        step,
-        skillFn
-      });
+        enriched = await this.applySkill({
+          task,
+          docs: enriched || docs,
+          step,
+          skillFn
+        });
 
-      const { filters } = step;
-      const filtered = await this.applyFilters({docs: enriched, filters});
-      enriched = filtered;
+        const { filters } = step;
+        const filtered = await this.applyFilters({docs: enriched, filters});
+        enriched = filtered;
+      }
+      catch(err) {
+        // @TODO
+        // Update relevant task record(s) and rethrow error
+        throw err;
+      }
     }
     return enriched;
   }

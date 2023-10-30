@@ -3,14 +3,15 @@ import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { SharedModule } from '../shared/shared.module';
 import { DocsModule } from '../docs/docs.module';
-import { Runner } from './runner';
+import { RunnerFactory } from './runner';
 
 @Module({
   imports: [
     SharedModule,
     DocsModule,
   ],
-  providers: [TasksService, Runner],
+  providers: [TasksService, RunnerFactory],
   controllers: [TasksController],
+  exports: [RunnerFactory]
 })
 export class TasksModule {}

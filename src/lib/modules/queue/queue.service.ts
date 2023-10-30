@@ -1,14 +1,15 @@
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Job, JobStatus } from './entities/job.entity';
 import { JobInDto } from './dtos/job.in.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, EventPattern, Payload } from '@nestjs/microservices';
+import { JOB_EVENT } from '../../../constants';
 
 const t = 60;
 
 @Injectable()
-export class QueueService implements OnModuleInit {
+export class QueueService {
 
   private readonly logger = new Logger(QueueService.name, {timestamp: true});
   private jobRepository: Repository<Job>
@@ -20,19 +21,6 @@ export class QueueService implements OnModuleInit {
     this.jobRepository = this.dataSource.getRepository(Job);
   }
 
-  // Lifecycle hook for module initialization
-  async onModuleInit() {
-    if (process.env.CHOLLO_SERVICE === 'worker') return; 
-    // Set an interval to check for jobs
-    setInterval(async () => {
-      const job = await this.fetchNextJob();
-      if (job) {
-        this.logger.debug({job});
-      }
-    }, t * 1000);  // Check every `x` seconds
-  }
-
-  // Add a new job to the queue
   async addJob(data: JobInDto): Promise<Job> {
     const job = new Job();
     job.name = data.name;
@@ -42,11 +30,10 @@ export class QueueService implements OnModuleInit {
     job.status = JobStatus.QUEUED;
     job.created = new Date();
     const saved = await this.jobRepository.save(job);
-    this.client.emit('job_created', job);
+    this.client.emit(JOB_EVENT.QUEUED, job);
     return saved;
   }
 
-  // Fetch next job to be executed based on priority and time
   async fetchNextJob(): Promise<Job | null> {
     const job = await this.jobRepository
       .createQueryBuilder('job')
@@ -59,20 +46,24 @@ export class QueueService implements OnModuleInit {
     return job;
   }
 
-  async updateJobStatus(id: string, status: JobStatus): Promise<void> {
-    await this.jobRepository.update(id, { status, updated: new Date() });
+  async updateJobStatus(id: string, status: JobStatus): Promise<UpdateResult> {
+    return await this.jobRepository.update(id, { status, updated: new Date() });
   }
 
-  async deleteJob(id: string): Promise<void> {
-    await this.jobRepository.delete(id);
+  async deleteJob(id: string): Promise<DeleteResult> {
+    return await this.jobRepository.delete(id);
+  }
+  
+  async deleteAll(): Promise<any> {
+    return await this.dataSource.createQueryBuilder().from(Job, 'job').delete().execute();
   }
 
-  async markAsCompleted(id: string): Promise<void> {
-    await this.updateJobStatus(id, JobStatus.COMPLETED);
+  async markAsCompleted(id: string): Promise<UpdateResult> {
+    return await this.updateJobStatus(id, JobStatus.COMPLETED);
   }
 
-  async markAsFailed(id: string): Promise<void> {
-    await this.updateJobStatus(id, JobStatus.FAILED);
+  async markAsFailed(id: string): Promise<UpdateResult> {
+    return await this.updateJobStatus(id, JobStatus.FAILED);
   }
 
   async fetchJobsByStatus(status: JobStatus): Promise<Job[]> {
@@ -82,5 +73,4 @@ export class QueueService implements OnModuleInit {
   async rescheduleJob(id: string, newScheduledTime: Date): Promise<void> {
     await this.jobRepository.update(id, { scheduled: newScheduledTime, updated: new Date() });
   }
-
 }

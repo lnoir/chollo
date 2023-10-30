@@ -13,7 +13,7 @@ import { TaskActive } from './entities/task-active.entity';
 import { TaskLogged } from './entities/task-logged.entity';
 import { DocsModule } from '../docs/docs.module';
 import { TaskOutput } from './entities/task-output.entity';
-import { Runner } from './runner';
+import { RunnerFactory } from './runner';
 import { TaskStep } from './entities/task-step.entity';
 import { cv0 } from '../../../../test/cvs/cv0';
 
@@ -22,6 +22,7 @@ jest.setTimeout(240000);
 describe('TasksService', () => {
   let tasksService: TasksService;
   let docsService: DocsService;
+  let runnerFactory: RunnerFactory;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -39,11 +40,12 @@ describe('TasksService', () => {
         TypeOrmModule.forFeature([DocSource, DocFormat, DocConfig, Doc]),
         DocsModule,
       ],
-      providers: [TasksService]
+      providers: [TasksService, RunnerFactory]
     }).compile();
 
     tasksService = module.get<TasksService>(TasksService);
     docsService = module.get<DocsService>(DocsService);
+    runnerFactory = module.get<RunnerFactory>(RunnerFactory);
   });
 
   it('should be defined', () => {
@@ -119,7 +121,7 @@ describe('TasksService', () => {
       skill: 'runCoverLetterWriterAgent',
       params: cv0
     });
-    const runner = new Runner(docsService, tasksService);
+    const runner = runnerFactory.getNewRunner();
     const outputs = await runner.run(task.id);
     expect(outputs).toBeTruthy();
     

@@ -5,6 +5,8 @@ import { Doc } from './entities/doc.entity';
 import { DocSource } from './entities/doc-source.entity';
 import { DocFormat } from './entities/doc-format.entity';
 import { DocConfig } from './entities/doc-config.entity';
+import { testTypeOrmImportMain } from '../../../../test/pre-configured.imports';
+import { SharedModule } from '../shared/shared.module';
 
 describe('DocsService', () => {
   let service: DocsService;
@@ -13,13 +15,9 @@ describe('DocsService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [DocSource, DocFormat, DocConfig, Doc],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([DocSource, DocFormat, DocConfig, Doc])],
+        testTypeOrmImportMain,
+        SharedModule
+      ],
       providers: [DocsService],
       controllers: [],
       exports: [TypeOrmModule]
@@ -68,9 +66,9 @@ describe('DocsService', () => {
       type: 'html',
       name: `List Page ${testRun}.${testId}`,
       location: 'http://dummysite.com/items',
-      source: docSource,
+      source: docSource.id,
     };
-    const docFormatRes = await service.insertDocFormat(formatData);
+    const docFormatRes = await service.insertDocFormat(docSource.id, formatData);
     const docFormat = await service.getDocFormat(docFormatRes[0]);
     expect(docFormat.name).toBe(formatData.name);
     const updatedDocSource = await service.getDocSource(docSource.id);
@@ -90,9 +88,9 @@ describe('DocsService', () => {
       type: 'html',
       name: `List Page ${testRun}.${testId}`,
       location: 'http://dummysite.com/items',
-      source: docSource,
+      source: docSource.id,
     };
-    const docFormatRes = await service.insertDocFormat(formatData);
+    const docFormatRes = await service.insertDocFormat(docSource.id, formatData);
     const docFormat = await service.getDocFormat(docFormatRes[0]);
     const configData = {
       selector_type: 'element',
@@ -104,7 +102,7 @@ describe('DocsService', () => {
       ],
       js: false
     };
-    const configRes = await service.insertDocConfig(configData);
+    const configRes = await service.insertDocConfig(docFormat.id, configData);
     const docConfig = await service.getDocConfig(configRes[0]);
     docFormat.config = docConfig;
     await service.updateFormat(docFormat);
