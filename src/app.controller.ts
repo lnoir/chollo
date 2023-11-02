@@ -1,6 +1,5 @@
-import { Controller, Get, Post, Query } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
-import { DocSource } from './lib/modules/docs/entities/doc-source.entity';
 
 @Controller()
 export class AppController {
@@ -10,10 +9,4 @@ export class AppController {
   async getHello(): Promise<any> {
     return { status: 'ready' }
   }
-
-  @Post()
-  async createSource(): Promise<DocSource> {
-    return 
-  }
 }
-

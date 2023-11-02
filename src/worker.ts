@@ -7,9 +7,10 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: {
       host: 'localhost',
-      port: 3100,
+      port: process.env.CHOLLO_QUEUE_PORT,
     },
   });
   app.listen();
+  console.log(`Worker running on port ${process.env.CHOLLO_QUEUE_PORT}`);
 }
 bootstrap();
