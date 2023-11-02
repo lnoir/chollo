@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Delete, Put } from '@nestjs/common';
 import { DocsService } from './docs.service';
 import { DocSource } from './entities/doc-source.entity';
 import { DocFormat } from './entities/doc-format.entity';
@@ -7,6 +7,7 @@ import { Doc } from './entities/doc.entity';
 import { DocSourceDto } from './dtos/doc-source.dto';
 import { DocFormatDto } from './dtos/doc-format.dto';
 import { DocConfigDto } from './dtos/doc-config.dto';
+import { DocFormatInDto } from './dtos/doc-format.in.dto';
 
 @Controller('docs')
 export class DocsController {
@@ -27,6 +28,11 @@ export class DocsController {
   async getDocSource(@Param('id') id: number): Promise<DocSource> {
     return this.docsService.getDocSource(id);
   }
+  
+  @Delete('source/:id')
+  async deleteDocSource(@Param('id') id: number): Promise<any> {
+    return this.docsService.deleteDocSource(id);
+  }
 
   @Get('source')
   async getDocSources(): Promise<DocSource[]> {
@@ -35,12 +41,11 @@ export class DocsController {
   // END DocSource
 
   // DocFormat
-  @Post('source/:sourceId/format')
+  @Post('format')
   async insertDocFormat(
-    @Param('sourceId') sourceId: number,
-    @Body() data: DocFormatDto
+    @Body() data: DocFormatInDto
   ): Promise<DocFormat> {
-    return this.docsService.insertDocFormat(sourceId, data);
+    return this.docsService.insertDocFormat(data);
   }
 
   @Put('format/:id')

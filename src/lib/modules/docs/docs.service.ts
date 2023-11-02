@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
 import { Doc } from './entities/doc.entity';
-import { DataSource, DeleteResult, EntityTarget, ObjectLiteral, UpdateResult } from 'typeorm';
+import { DataSource, DeleteResult, UpdateResult } from 'typeorm';
 import { DocSource } from './entities/doc-source.entity';
 import { DocFormat } from './entities/doc-format.entity';
 import { DocConfig } from './entities/doc-config.entity';
 import { QueryService } from '../shared/query/query.service';
-import { DocFormatDto } from './dtos/doc-format.dto';
 import { DocSourceDto } from './dtos/doc-source.dto';
 import { DocConfigDto } from './dtos/doc-config.dto';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DocFormatInDto } from './dtos/doc-format.in.dto';
 
 @Injectable()
 export class DocsService extends QueryService{
@@ -26,15 +26,6 @@ export class DocsService extends QueryService{
     docSource.location = location;
     docSource.created = new Date().toISOString();
     return this.save(docSource);
-  }
-
-  async insertDocFormat(sourceId: number, data: DocFormatDto): Promise<DocFormat> {
-    const source = await this.getDocSource(sourceId);
-    const shell = new DocFormat();
-    const docFormat = this.objectToEntity<DocFormat>(shell, data);
-    docFormat.source = source;
-    docFormat.created = new Date().toISOString();
-    return this.save<DocFormat>(docFormat);
   }
   
   async insertDocConfig(formatId: number, data: DocConfigDto): Promise<any> {
@@ -54,7 +45,7 @@ export class DocsService extends QueryService{
     );
   }
 
-  updateDoc(key: string, data: any): Promise<UpdateResult> {
+  private updateDoc(key: number | string, data: any): Promise<UpdateResult> {
     return this.dataSource
     .createQueryBuilder()
     .update(Doc)
@@ -71,9 +62,42 @@ export class DocsService extends QueryService{
     return this.dataSource.manager.findOneBy(DocSource, {id});
   }
 
+  updateDocSource(id: number, data: DocSourceDto): Promise<UpdateResult> {
+    return this.updateDoc(id, data);
+  }
+
+  async deleteDocSource(id: number): Promise<DeleteResult> {
+    const source = await this.getDocSource(id);
+    if (!source) return;
+    if (source.formats?.length) throw new Error('Source contains data');
+    return this.dataSource.manager.delete(DocSource, id);
+  }
+
+  /* Formats */
+  async insertDocFormat(data: DocFormatInDto): Promise<DocFormat> {
+    const source = await this.getDocSource(data.source);
+    if (!source) throw new Error(`Invalid source: '${data.source}`);
+    const shell = new DocFormat();
+    const docFormat = this.objectToEntity<DocFormat>(shell, data);
+    docFormat.source = source;
+    docFormat.created = new Date().toISOString();
+    return this.save<DocFormat>(docFormat);
+  }
+
   getDocFormat(id: number): Promise<DocFormat> {
     return this.findOne<DocFormat>(DocFormat, id);
   }
+
+  updateFormat(format: DocFormatInDto) {
+    return this.dataSource.manager.save(format);
+  }
+
+  async deleteDocFormat(id: number): Promise<DeleteResult> {
+    const format = await this.getDocFormat(id);
+    if (!format) return;
+    return this.dataSource.manager.delete(DocFormat, id);
+  }
+  /* /Formats */
 
   getDocConfig(id: number): Promise<DocConfig> {
     return this.dataSource.manager.findOneBy(DocConfig, {id});
@@ -85,10 +109,6 @@ export class DocsService extends QueryService{
 
   getDocBy(column: string, value: number | string): Promise<Doc | null> {
     return this.dataSource.manager.findOneBy(Doc, {[column]: value});
-  }
-
-  updateFormat(format: DocFormat) {
-    return this.dataSource.manager.save(format);
   }
 
   async removeDocConfig(id: number): Promise<DeleteResult> {

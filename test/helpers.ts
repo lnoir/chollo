@@ -35,8 +35,12 @@ export async function setupTestDocs(
   const source = await docsService.insertDocSource({
     name: `Test ${now}`, type: 'web', location: sourceLocation || 'http://testymctest.face'
   });
-  const format = await docsService.insertDocFormat(source.id, {
-    name: `List format ${now}`, type: 'html', location: formatLocation || '/list-page', agent: 'job'
+  const format = await docsService.insertDocFormat({
+    name: `List format ${now}`,
+    type: 'html',
+    location: formatLocation || '/list-page',
+    agent: 'job',
+    source: source.id
   });
   const config = await docsService.insertDocConfig(format.id, {
     selector_type: 'element',

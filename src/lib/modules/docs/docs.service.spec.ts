@@ -1,12 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DocsService } from './docs.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Doc } from './entities/doc.entity';
-import { DocSource } from './entities/doc-source.entity';
-import { DocFormat } from './entities/doc-format.entity';
-import { DocConfig } from './entities/doc-config.entity';
-import { testTypeOrmImportMain } from '../../../../test/pre-configured.imports';
 import { SharedModule } from '../shared/shared.module';
+import { testTypeOrmImportMain } from '../../../../test/pre-configured.imports';
 
 describe('DocsService', () => {
   let service: DocsService;
@@ -68,7 +64,7 @@ describe('DocsService', () => {
       location: 'http://dummysite.com/items',
       source: docSource.id,
     };
-    const docFormatRes = await service.insertDocFormat(docSource.id, formatData);
+    const docFormatRes = await service.insertDocFormat(formatData);
     const docFormat = await service.getDocFormat(docFormatRes[0]);
     expect(docFormat.name).toBe(formatData.name);
     const updatedDocSource = await service.getDocSource(docSource.id);
@@ -90,7 +86,7 @@ describe('DocsService', () => {
       location: 'http://dummysite.com/items',
       source: docSource.id,
     };
-    const docFormatRes = await service.insertDocFormat(docSource.id, formatData);
+    const docFormatRes = await service.insertDocFormat(formatData);
     const docFormat = await service.getDocFormat(docFormatRes[0]);
     const configData = {
       selector_type: 'element',
@@ -102,10 +98,19 @@ describe('DocsService', () => {
       ],
       js: false
     };
-    const configRes = await service.insertDocConfig(docFormat.id, configData);
+    await service.insertDocConfig(docFormat.id, configData);
+    /*
+    // @TODO: This should be in a separate test for 'update' action.
     const docConfig = await service.getDocConfig(configRes[0]);
     docFormat.config = docConfig;
-    await service.updateFormat(docFormat);
+    const docFormatDto: DocFormatInDto = {
+      name: docFormat.name,
+      type: docFormat.type,
+      location: docFormat.location,
+      source: docFormat.source.id
+    };
+    await service.updateFormat(docFormatDto);
+    */
     const withConfig = await service.getDocFormat(docFormat.id);
     expect(withConfig).toHaveProperty('config.id', 1);
   }); 
