@@ -3,19 +3,11 @@ import { TasksService } from './tasks.service';
 import { setupTestDocs, staticTestHost } from '../../../../test/helpers';
 import { DocsService } from '../docs/docs.service';
 import { SharedModule } from '../shared/shared.module';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { DocSource } from '../docs/entities/doc-source.entity';
-import { DocFormat } from '../docs/entities/doc-format.entity';
-import { DocConfig } from '../docs/entities/doc-config.entity';
-import { Doc } from '../docs/entities/doc.entity';
 import { TaskScheduled } from './entities/task-scheduled.entity';
-import { TaskActive } from './entities/task-active.entity';
-import { TaskLogged } from './entities/task-logged.entity';
 import { DocsModule } from '../docs/docs.module';
-import { TaskOutput } from './entities/task-output.entity';
 import { RunnerFactory } from './runner';
-import { TaskStep } from './entities/task-step.entity';
 import { cv0 } from '../../../../test/cvs/cv0';
+import { testTypeOrmImportMain } from '../../../../test/pre-configured.imports';
 
 jest.setTimeout(240000);
 
@@ -28,16 +20,7 @@ describe('TasksService', () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [
         SharedModule,
-        TypeOrmModule.forRoot({
-          type: 'sqlite',
-          database: ':memory:',
-          entities: [
-            DocSource, DocFormat, DocConfig, Doc,
-            TaskScheduled, TaskStep, TaskActive, TaskLogged, TaskOutput
-          ],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([DocSource, DocFormat, DocConfig, Doc]),
+        testTypeOrmImportMain,
         DocsModule,
       ],
       providers: [TasksService, RunnerFactory]
