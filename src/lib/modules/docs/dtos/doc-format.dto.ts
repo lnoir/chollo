@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsString, IsNumber, IsOptional } from 'class-validator';
-import { DocConfigDto } from './doc-config.dto';
+import { DocConfigOutDto } from './doc-config.out.dto';
 import { DocSourceDto } from './doc-source.dto';
 
 export class DocFormatDto {
@@ -26,5 +26,5 @@ export class DocFormatDto {
   source?: DocSourceDto;
 
   @ApiPropertyOptional()
-  config?: DocConfigDto;
+  config?: DocConfigOutDto;
 }

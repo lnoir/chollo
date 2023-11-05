@@ -6,12 +6,12 @@ import { DocFormat } from './entities/doc-format.entity';
 import { DocConfig } from './entities/doc-config.entity';
 import { QueryService } from '../shared/query/query.service';
 import { DocSourceDto } from './dtos/doc-source.dto';
-import { DocConfigDto } from './dtos/doc-config.dto';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DocFormatInDto } from './dtos/doc-format.in.dto';
+import { DocConfigInDto } from './dtos/doc-config.in.dto';
 
 @Injectable()
-export class DocsService extends QueryService{
+export class DocsService extends QueryService {
   constructor(
     @InjectDataSource() protected readonly dataSource: DataSource,
   ) {
@@ -28,7 +28,8 @@ export class DocsService extends QueryService{
     return this.save(docSource);
   }
   
-  async insertDocConfig(formatId: number, data: DocConfigDto): Promise<any> {
+  async insertDocConfig(data: DocConfigInDto): Promise<any> {
+    const formatId = data.format;
     const format = await this.getDocFormat(formatId);
     const shell = new DocConfig();
     const docConfig = this.objectToEntity<DocConfig>(shell, data);

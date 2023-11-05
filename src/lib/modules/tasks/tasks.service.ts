@@ -62,6 +62,10 @@ export class TasksService extends QueryService {
     return this.dataSource.manager.find(TaskScheduled, opts)
   }
 
+  findTaskScheduled(id: number): Promise<TaskScheduled> {
+    return this.findOne<TaskScheduled>(TaskScheduled, id);
+  }
+
   updateScheduledTask(data: any): Promise<UpdateResult> {
     return this.dataSource.manager.save(data);
   }

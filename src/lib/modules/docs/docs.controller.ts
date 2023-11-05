@@ -6,8 +6,9 @@ import { DocConfig } from './entities/doc-config.entity';
 import { Doc } from './entities/doc.entity';
 import { DocSourceDto } from './dtos/doc-source.dto';
 import { DocFormatDto } from './dtos/doc-format.dto';
-import { DocConfigDto } from './dtos/doc-config.dto';
+import { DocConfigOutDto } from './dtos/doc-config.out.dto';
 import { DocFormatInDto } from './dtos/doc-format.in.dto';
+import { DocConfigInDto } from './dtos/doc-config.in.dto';
 
 @Controller('docs')
 export class DocsController {
@@ -60,12 +61,11 @@ export class DocsController {
   // END DocFormat
 
   // DocConfig
-  @Post('format/:formatId/config')
+  @Post('config')
   async insertDocConfig(
-    @Param('formatId') formatId: number,
-    @Body() data: DocConfigDto
+    @Body() data: DocConfigInDto
   ): Promise<DocFormat> {
-    return this.docsService.insertDocConfig(formatId, data);
+    return this.docsService.insertDocConfig(data);
   }
 
   @Put('config/:id')

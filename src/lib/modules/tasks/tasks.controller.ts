@@ -3,6 +3,8 @@ import { TasksService } from './tasks.service';
 import { TaskScheduled } from './entities/task-scheduled.entity';
 import { TaskActive } from './entities/task-active.entity';
 import { TaskLogged } from './entities/task-logged.entity';
+import { TaskStep } from './entities/task-step.entity';
+import { TaskStepInDto } from './dtos/task-step.in.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -24,10 +26,32 @@ export class TasksController {
     return this.tasksService.updateScheduledTask(data);
   }
 
+  @Get('scheduled/:id')
+  async getTaskScheduled(@Param('Id') id: number): Promise<TaskScheduled> {
+    return this.tasksService.findTaskScheduled(id);
+  }
+
   @Delete('scheduled/:id')
   async deleteScheduledTask(@Param('id') id: number): Promise<any> {
     return this.tasksService.removeScheduledTask(id);
   }
+  
+  // Scheduled Tasks
+  @Post('step')
+  async createTaskStep(@Body() data: TaskStepInDto): Promise<TaskStep> {
+    return this.tasksService.insertTaskStep(data);
+  }
+
+  /*
+  @Get('step')
+  async getTaskSteps(@Query() opts?: any): Promise<TaskStep[]> {
+    return this.tasksService.find(opts);
+  }
+
+  @Put('step')
+  async updateTaskStep(@Body() data: TaskStepInDto): Promise<TaskStep> {
+    return this.tasksService.updateTaskStep(data);
+  }*/
 
   // Active Tasks
   @Post('active')

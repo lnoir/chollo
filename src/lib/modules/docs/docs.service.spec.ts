@@ -96,9 +96,10 @@ describe('DocsService', () => {
         {content: '.card-body'},
         {source: 'h2 a'}
       ],
-      js: false
+      js: false,
+      format: docFormat.id
     };
-    await service.insertDocConfig(docFormat.id, configData);
+    await service.insertDocConfig(configData);
     /*
     // @TODO: This should be in a separate test for 'update' action.
     const docConfig = await service.getDocConfig(configRes[0]);

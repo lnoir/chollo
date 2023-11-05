@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, OneToMany, ManyToOne } from 'typeorm';
 import { DocSource } from '../../docs/entities/doc-source.entity';
 import { DocFormat } from '../../docs/entities/doc-format.entity';
 import { TaskOutput } from './task-output.entity';
@@ -9,11 +9,11 @@ export class TaskScheduled {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => DocSource, {eager: true})
+  @ManyToOne(() => DocSource, (source) => source.tasks, {eager: true})
   @JoinColumn()
   source: DocSource;
 
-  @OneToOne(() => DocFormat, {eager: true})
+  @ManyToOne(() => DocFormat, (format) => format.tasks, {eager: true})
   @JoinColumn()
   format: DocFormat;
 

@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn, Index } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn, Index, OneToMany } from 'typeorm';
 import { DocSource } from './doc-source.entity';
 import { DocConfig } from './doc-config.entity';
+import { TaskScheduled } from '../../tasks/entities/task-scheduled.entity';
 
 @Entity()
 export class DocFormat {
@@ -18,6 +19,9 @@ export class DocFormat {
   
   @ManyToOne(() => DocSource, (doc_source) => doc_source.formats)
   source: DocSource;
+
+  @OneToMany(() => TaskScheduled,  (taskScheduled) => {taskScheduled.source})
+  tasks: TaskScheduled[];
 
   @OneToOne(() => DocConfig, (config) => config.format, {eager: true})
   @JoinColumn()

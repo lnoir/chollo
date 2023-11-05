@@ -2,7 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsString, IsOptional, IsBoolean, IsObject } from 'class-validator';
 import { DocFormatDto } from './doc-format.dto';
 
-export class DocConfigDto {
+export class DocConfigOutDto {
   @ApiPropertyOptional({
     description: 'The selector type for the document configuration',
     enum: ['element', 'pattern'],

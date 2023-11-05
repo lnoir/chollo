@@ -42,7 +42,7 @@ export async function setupTestDocs(
     agent: 'job',
     source: source.id
   });
-  const config = await docsService.insertDocConfig(format.id, {
+  const config = await docsService.insertDocConfig({
     selector_type: 'element',
     selector: 'article',
     js: false,
