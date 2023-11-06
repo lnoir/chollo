@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsDate } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsDate, IsOptional } from 'class-validator';
 
 export class TaskStepInDto {
   @ApiProperty({
@@ -28,26 +28,30 @@ export class TaskStepInDto {
   })
   skill: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Parameters to pass to the agent skill',
     type: String,
   })
+  @IsOptional()
   params?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Criteria that must be met to run this skill on an output item',
   })
+  @IsOptional()
   filters?: object[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Text output',
     type: String,
   })
+  @IsOptional()
   text?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'JSON output',
     type: String,
   })
+  @IsOptional()
   json?: Record<string, any>;
 }

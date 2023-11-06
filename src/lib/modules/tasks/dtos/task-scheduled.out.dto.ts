@@ -8,11 +8,14 @@ export class TaskScheduledOutDto {
     description: 'The ID of the scheduled task',
     example: 1,
   })
-  @ApiPropertyOptional()
-  @IsNumber()
-  @IsOptional()
   id: number;
 
+  @ApiProperty({
+    description: 'The name of the scheduled task',
+    example: 1,
+  })
+  name: string;
+  
   @ApiProperty({
     description: 'The source object',
     type: DocSourceDto,
@@ -47,6 +50,5 @@ export class TaskScheduledOutDto {
     description: 'The scheduled date and time for the task',
     example: '2023-01-01T12:00:00Z',
   })
-  @IsDate()
   scheduled: string;
 }

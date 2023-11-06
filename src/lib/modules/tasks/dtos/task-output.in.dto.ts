@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDate } from 'class-validator';
 
 export class TaskOutputInDto {
@@ -8,13 +8,13 @@ export class TaskOutputInDto {
   })
   task: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Text output',
     type: String,
   })
   text?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'JSON output',
     type: String,
   })
@@ -24,11 +24,11 @@ export class TaskOutputInDto {
     description: 'Text output',
     type: String,
   })
-  agent?: string;
+  agent: string;
 
   @ApiProperty({
     description: 'Text output',
     type: String,
   })
-  skill?: string;
+  skill: string;
 }
