@@ -24,7 +24,7 @@ export class QueueController {
 
   @Delete('job/:id')
   async deleteJob(
-    @Param('id') id: string
+    @Param('id') id: number
   ) {
     this.logger.debug(id, '@deleteJob');
     return await this.queueService.deleteJob(id);

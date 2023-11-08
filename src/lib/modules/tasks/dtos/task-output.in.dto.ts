@@ -1,5 +1,4 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsDate } from 'class-validator';
 
 export class TaskOutputInDto {
   @ApiProperty({
@@ -7,6 +6,12 @@ export class TaskOutputInDto {
     example: 1,
   })
   task: number;
+
+  @ApiProperty({
+    description: 'The ID of the job that produced the output',
+    example: 1,
+  })
+  job: number;
 
   @ApiPropertyOptional({
     description: 'Text output',

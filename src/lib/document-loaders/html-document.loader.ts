@@ -3,17 +3,7 @@ import { CholloDocumentLoader } from "./choll-document.loader";
 import fetch from "node-fetch";
 import { load } from "cheerio";
 import puppeteer from "puppeteer";
-
-type PropertyType = 'string' | 'number';
-
-type PropertySelector = {
-  selector: string;
-  type?: PropertyType;
-}
-
-type PropertySelectorMap = {
-  [prop: string]: PropertySelector | string;
-}
+import { PropertySelectorMap } from "../modules/docs/docs.types";
 
 export type HtmlDocumentOptions = {
   selector?: string;
@@ -56,36 +46,31 @@ export class HtmlDocumentLoader extends CholloDocumentLoader<HtmlDocumentOptions
     }
     // Now we get funky...
     else {
+      const metadata: Record<string, any> = {};
       let content = '';
       let source = '';
-      for (const pair of this.options.map) {
-        const [key, map] = Object.entries(pair)[0];
-        let selector: string, type = 'string';
-        if (typeof map === 'string') {
-          selector = map;
-        }
-        else if (typeof map === 'object') {
-          ({selector, type} = map as any);
-        }
-        else {
-          console.warn('Skipped map - invalid map type:', typeof map);
+      for (const map of this.options.map) {
+        const { property, selector, type } = map;
+        if (property === 'source') {
+          source = $(selector).attr('href') || this.location;
+          metadata[property] = source;
           continue;
         }
-        if (key === 'source') {
-          source = $(selector).attr('href') || this.location;
-        }
-        $(selector).each((i, el) => {
+        const found = $(selector);
+        found.each((i, el) => {
           if (content) content += '\n';
-          content += `${key.toUpperCase()}: ${$(el).text()?.replace(/\s+/, ' ')}`
+          const cleaned = `${$(el).text()?.replace(/\s+/, ' ')}`;
+          content += `${property.toUpperCase()}: ${cleaned}`;
+          if (!Array.isArray(metadata[property])) metadata[property] = [];
+          metadata[property].push(cleaned);
         });
       }
       if (!content) return doc;
 
+      metadata.source = metadata.source || this.location;
       doc = new Document({
         pageContent: content,
-        metadata: {
-          source: source || this.location
-        }
+        metadata,
       });
     }
     return doc;

@@ -9,6 +9,9 @@ export class TaskOutput {
   @ManyToOne(() => TaskScheduled, (task) => task.output)
   @JoinColumn()
   task: TaskScheduled;
+
+  @Column()
+  job: number;
   
   @Column()
   agent: string;

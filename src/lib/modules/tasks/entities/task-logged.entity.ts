@@ -5,16 +5,22 @@ export class TaskLogged {
   id: number;
 
   @Column()
+  task: number;
+
+  @Column()
+  job: number;
+  
+  @Column()
   source: string;
 
   @Column()
   format: string;
-
-  @Column({type: 'datetime'})
-  scheduled: string;
   
   @Column({enum: ['completed','cancelled','failed']})
   status: string;
+
+  @Column({nullable: true})
+  message: string;
 
   @Column({type: 'datetime'})
   start: string;

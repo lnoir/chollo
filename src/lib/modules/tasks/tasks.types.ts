@@ -26,3 +26,21 @@ export type MatchFilterFnParams = {
 export interface MatchFilterFn {
   (params: MatchFilterFnParams): GenericMatchDoc[]
 }
+
+enum units {
+  'minute',
+  'minutes',
+  'hour',
+  'hours',
+  'week',
+  'weeks',
+  'month',
+  'months'
+};
+
+type ValidUnits = keyof typeof units;
+
+export type Recurrence = {
+  unit: ValidUnits;
+  value: number;
+}

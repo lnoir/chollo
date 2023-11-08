@@ -1,5 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsDate, IsNumber, IsOptional } from 'class-validator';
+import { Recurrence } from '../tasks.types';
+
+
 export class TaskScheduledInDto {
   @ApiProperty({
     description: 'The ID of the scheduled task',
@@ -7,7 +10,7 @@ export class TaskScheduledInDto {
   })
   @IsNumber()
   @IsOptional()
-  id: number;
+  id?: number;
 
   @ApiProperty({
     description: 'The name of the scheduled task',
@@ -41,4 +44,11 @@ export class TaskScheduledInDto {
   @IsDate()
   @IsOptional()
   scheduled?: string;
+
+  @ApiPropertyOptional({
+    description: 'The scheduled date and time for the task',
+    example: '{unit: "hours", "value": "24"}',
+  })
+  @IsOptional()
+  interval?: Recurrence;
 }

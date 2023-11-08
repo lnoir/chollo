@@ -31,6 +31,7 @@
     "@xenova/transformers": "^2.7.0",
     "cheerio": "^1.0.0-rc.12",
     "class-validator": "^0.14.0",
+    "date-fns": "^2.30.0",
     "hnswlib-node": "^1.4.2",
     "html-to-text": "^9.0.5",
     "langchain": "^0.0.171",

@@ -8,6 +8,8 @@ import { DocsModule } from '../docs/docs.module';
 import { RunnerFactory } from './runner';
 import { cv0 } from '../../../../test/cvs/cv0';
 import { testTypeOrmImportMain } from '../../../../test/pre-configured.imports';
+import { Job } from '../queue/entities/job.entity';
+import { JobStatus } from '../../../types';
 
 jest.setTimeout(240000);
 
@@ -40,6 +42,7 @@ describe('TasksService', () => {
     const scheduled = new Date();
     scheduled.setDate(scheduled.getDate() + 1);
     const task = await tasksService.insertScheduledTask({
+      name: '',
       source: source.id,
       format: format.id,
       scheduled: scheduled.toISOString()
@@ -54,13 +57,17 @@ describe('TasksService', () => {
     const scheduled = new Date();
     scheduled.setDate(scheduled.getDate() + 1);
     const task = await tasksService.insertScheduledTask({
+      name: '',
       source: source.id,
       format: format.id,
       scheduled: scheduled.toISOString()
     });
     const output = await tasksService.insertTaskOutput({
       task: task.id,
+      agent: '',
+      skill: '',
       json: { fake: 'data', value: 'whatever' },
+      job: 1
     });
     expect(output).toBeTruthy();
     expect(output).toHaveProperty('id');
@@ -68,7 +75,7 @@ describe('TasksService', () => {
     expect(output.task.id).toEqual(task.id);
   });
   
-  fit('should run a task', async () => {
+  fit('should run a job', async () => {
     const { format, source } = await setupTestDocs({
       docsService,
       sourceLocation: staticTestHost,
@@ -77,6 +84,7 @@ describe('TasksService', () => {
     const scheduled = new Date();
     scheduled.setDate(scheduled.getDate() + 1);
     const task = await tasksService.insertScheduledTask({
+      name: '',
       source: source.id,
       format: format.id,
       scheduled: scheduled.toISOString(),
@@ -104,8 +112,19 @@ describe('TasksService', () => {
       skill: 'runCoverLetterWriterAgent',
       params: cv0
     });
+    const job: Job = {
+      id: 1,
+      task: task.id,
+      name: '',
+      description: '',
+      priority: 0,
+      status: JobStatus.QUEUED,
+      scheduled: new Date(),
+      created: new Date(),
+      updated: null
+    };
     const runner = runnerFactory.getNewRunner();
-    const outputs = await runner.run(task.id);
+    const outputs = await runner.run(job);
     expect(outputs).toBeTruthy();
     
     const completedTask = await tasksService.findOne<TaskScheduled>(TaskScheduled, task.id);

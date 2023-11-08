@@ -69,7 +69,11 @@ export class DocsController {
   }
 
   @Put('config/:id')
-  async updateDocConfig(@Param('id') id: number, @Body() data: any): Promise<any> {
+  async updateDocConfig(
+    @Param('id') id: number,
+    @Body() data: DocConfigInDto
+  ): Promise<any> {
+    delete data.format; // Must be removed for updates
     return this.docsService.updateBy(DocConfig, data, { id });
   }
   

@@ -1,7 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsDate, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 import { DocFormatDto } from '../../docs/dtos/doc-format.dto';
 import { DocSourceDto } from '../../docs/dtos/doc-source.dto';
+import { Recurrence } from '../tasks.types';
 
 export class TaskScheduledOutDto {
   @ApiProperty({
@@ -51,4 +52,11 @@ export class TaskScheduledOutDto {
     example: '2023-01-01T12:00:00Z',
   })
   scheduled: string;
+
+  @ApiPropertyOptional({
+    description: 'The scheduled date and time for the task',
+    example: '{unit: "hours", "value": "24"}',
+  })
+  @IsOptional()
+  interval?: Recurrence;
 }

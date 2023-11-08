@@ -33,8 +33,9 @@ export class QueryService {
     data: any,
     criteria: any
   ): Promise<UpdateResult> {
+    console.log(criteria, data)
     const stmt = await this.dataSource.manager
-    .update(entity, data, criteria);
+    .update(entity, criteria, data);
     return stmt;
   }
 

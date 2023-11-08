@@ -3,11 +3,16 @@ import { DocSource } from '../../docs/entities/doc-source.entity';
 import { DocFormat } from '../../docs/entities/doc-format.entity';
 import { TaskOutput } from './task-output.entity';
 import { TaskStep } from './task-step.entity';
+import { Job } from '../../queue/entities/job.entity';
+import { Recurrence } from '../tasks.types';
 
 @Entity()
 export class TaskScheduled {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({nullable: true})
+  name?: string;
 
   @ManyToOne(() => DocSource, (source) => source.tasks, {eager: true})
   @JoinColumn()
@@ -25,6 +30,9 @@ export class TaskScheduled {
 
   @Column({type: 'datetime'})
   scheduled: string;
+
+  @Column({type: 'json', nullable: true})
+  interval: Recurrence;
 
   @OneToMany(() => TaskOutput, output => output.task, {nullable: true, eager: true})
   output: TaskOutput[];

@@ -5,6 +5,7 @@ import { TaskScheduled } from './entities/task-scheduled.entity';
 import { TasksService } from './tasks.service';
 import { JobAgent } from '../../agents/job.agent';
 import { AllFilters } from './filters';
+import { Job } from '../queue/entities/job.entity';
 
 const agents = {
   'job': JobAgent
@@ -63,10 +64,11 @@ class Runner {
     return { retriever, location, task };
   }
 
-  private async applySkill({task, docs, step, skillFn}) {
+  private async applySkill({task, docs, step, skillFn, job}) {
     const { agent, skill, params } = step;
     const modified = [];
     for (const doc of docs) {
+      console.log('@doc', doc, '/@doc');
       const res = await skillFn({doc: doc.pageContent, params});
       const enriched = {
         ...doc,
@@ -79,6 +81,7 @@ class Runner {
         json: enriched,
         agent,
         skill,
+        job
       });
       modified.push(enriched);
     }
@@ -100,8 +103,8 @@ class Runner {
     }, Promise.resolve(docs));
   }
 
-  async run(taskId: number): Promise<object[]> {
-    const { task, retriever, location } = await this.prepareRun(taskId);
+  async run(job: Job): Promise<object[]> {
+    const { task, retriever, location } = await this.prepareRun(job.task);
     const docs = await retriever.load();
     
     let enriched: object[];
@@ -117,7 +120,8 @@ class Runner {
           task,
           docs: enriched || docs,
           step,
-          skillFn
+          skillFn,
+          job: job.id
         });
 
         const { filters } = step;

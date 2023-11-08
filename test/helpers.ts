@@ -9,6 +9,7 @@ import { TaskStep } from '../src/lib/modules/tasks/entities/task-step.entity';
 import { TaskActive } from '../src/lib/modules/tasks/entities/task-active.entity';
 import { TaskLogged } from '../src/lib/modules/tasks/entities/task-logged.entity';
 import { TaskOutput } from '../src/lib/modules/tasks/entities/task-output.entity';
+import { PropertySelectorMap } from "../src/lib/modules/docs/docs.types";
 
 export const mainEntities = [
   DocSource, DocFormat, DocConfig, Doc, TaskScheduled, TaskStep, TaskActive, TaskLogged, TaskOutput
@@ -21,7 +22,7 @@ type Services = {
   tasksService?: TasksService,
   sourceLocation?: string,
   formatLocation?: string,
-  map?: object[];
+  map?: PropertySelectorMap[];
 }
 
 export const getStaticUrl = (path: string) => {
@@ -46,9 +47,9 @@ export async function setupTestDocs(
     selector_type: 'element',
     selector: 'article',
     js: false,
-    map: map && [
-      { title: 'h2' },
-      { content: '.main-content' }
+    map: map || [
+      { property: 'title', selector: 'h2', type: 'string' },
+      { property: 'content', selector: '.main-content', type: 'string' }
     ]
   });
   return { source, format, config }

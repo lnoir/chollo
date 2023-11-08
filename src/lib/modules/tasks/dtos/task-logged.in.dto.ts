@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString, IsDate, IsEnum } from 'class-validator';
+import { JobStatus } from '../../../../types';
 
 export class TaskLoggedOutDto {
   @ApiProperty({
@@ -7,7 +8,7 @@ export class TaskLoggedOutDto {
     example: 1,
   })
   @IsNumber()
-  id: number;
+  task: number;
 
   @ApiProperty({
     description: 'The ID of the job that produced the output',
@@ -22,17 +23,10 @@ export class TaskLoggedOutDto {
   source: string;
 
   @ApiProperty({
-    description: 'The summarised',
+    description: 'The summarised format',
   })
   @IsString()
   format: string;
-
-  @ApiProperty({
-    description: 'The scheduled date and time for the task',
-    example: '2023-01-01T12:00:00Z',
-  })
-  @IsDate()
-  scheduled: string;
   
   @ApiProperty({
     description: 'The status of the task',
@@ -40,7 +34,13 @@ export class TaskLoggedOutDto {
     enum: ['completed', 'cancelled', 'failed'],
   })
   @IsEnum(['completed', 'cancelled', 'failed'])
-  status: string;
+  status: JobStatus;
+
+  @ApiProperty({
+    description: 'Error message or any other info',
+  })
+  @IsString()
+  message: string; 
 
   @ApiProperty({
     description: 'The start date and time of the task',

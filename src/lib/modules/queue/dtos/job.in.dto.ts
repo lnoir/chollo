@@ -1,5 +1,5 @@
 import { IsNumber, IsString, IsOptional, IsBoolean, IsEnum } from 'class-validator';
-import { JobStatus } from '../entities/job.entity';
+import { JobStatus } from '../../../../types';
 
 export class JobInDto {
   
@@ -16,10 +16,6 @@ export class JobInDto {
   @IsOptional()
   @IsBoolean()
   recurring?: boolean;
-
-  @IsOptional()
-  @IsString()
-  interval?: string; // date-fns-parseable relative string
 
   @IsOptional()
   @IsNumber()

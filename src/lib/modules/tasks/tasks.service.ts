@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource, DeleteResult, EntityTarget, FindManyOptions, ObjectLiteral, UpdateResult } from 'typeorm';
+import { DataSource, DeleteResult, FindManyOptions, FindOptionsWhere, InsertResult, UpdateResult } from 'typeorm';
 import { QueryService } from '../shared/query/query.service';
 import { TaskScheduled } from './entities/task-scheduled.entity';
 import { TaskActive } from './entities/task-active.entity';
@@ -11,12 +11,15 @@ import { TaskOutputInDto } from './dtos/task-output.in.dto';
 import { TaskOutput } from './entities/task-output.entity';
 import { TaskStepInDto } from './dtos/task-step.in.dto';
 import { TaskStep } from './entities/task-step.entity';
+import { QueueService } from '../queue/queue.service';
+import { Job } from '../queue/entities/job.entity';
 
 @Injectable()
 export class TasksService extends QueryService {
   constructor(
     @InjectDataSource() protected readonly dataSource: DataSource,
-    private readonly docsService: DocsService
+    private readonly docsService: DocsService,
+    private readonly queueService: QueueService
   ) {
     super(dataSource)
   }
@@ -28,7 +31,7 @@ export class TasksService extends QueryService {
     task.source = source;
     task.format = format;
     task.params = data.params;
-    task.scheduled = data.scheduled;
+    task.scheduled = data.scheduled || new Date().toISOString();
     task.created = this.getNow();
     return this.save<TaskScheduled>(task);
   }
@@ -53,6 +56,7 @@ export class TasksService extends QueryService {
     output.json = data.json;
     output.agent = data.agent;
     output.skill = data.skill;
+    output.job = data.job;
     output.task = task;
     output.created = this.getNow();
     return this.save<TaskOutput>(output);
@@ -70,7 +74,7 @@ export class TasksService extends QueryService {
     return this.dataSource.manager.save(data);
   }
 
-  removeScheduledTask(id: number): Promise<DeleteResult> {
+  deleteScheduledTask(id: number): Promise<DeleteResult> {
     return this.remove(TaskScheduled, { id });
   }
   
@@ -89,14 +93,42 @@ export class TasksService extends QueryService {
     return this.remove(TaskActive, { id });
   }
 
-  insertLoggedTask(data: any): Promise<number[]> {
-    return this.insert(
+ async insertLoggedTask(taskId: number, meta: any): Promise<InsertResult> {
+    const task = await this.findOne<TaskScheduled>(TaskScheduled, taskId);
+    const source = task.source.name;
+    const format = task.format.name;
+    const insertData = {...meta, source, format, task: taskId};
+    return this.dataSource.manager.insert<TaskLogged>(
       TaskLogged,
-      [{...data}]
+      [insertData]
     );
   }
 
-  findLoggedTasks(opts?: FindManyOptions): Promise<TaskLogged[]> {
-    return this.dataSource.manager.find(TaskLogged, opts)
+  findLoggedTasks(opts?: any): Promise<TaskLogged[]> {
+    return this.dataSource.manager.findBy(TaskLogged, opts);
+  }
+
+  async insertJobForTask(taskId: number): Promise<Job> {
+    const task = await this.findOne<TaskScheduled>(TaskScheduled, taskId);
+    if (!task) throw new Error(`Invalid task ID: ${taskId}`);
+    const job = await this.queueService.addJob({
+      name: task.name || `Task ${task.id}`,
+      task: task.id
+    });
+    return job;
+  }
+  
+  getJobByTaskId(taskId: number) {
+    return this.queueService.getJobByTaskId(taskId);
+  }
+
+  async deleteJobByTaskId(taskId: number) {
+    const task = await this.findOne<TaskScheduled>(TaskScheduled, taskId);
+    if (!task) throw new Error(`Invalid task ID: ${taskId}`);
+    return await this.queueService.deleteJobByTaskId(task.id);
+  }
+
+  async findOutputsByJobId(job: number) {
+    return this.dataSource.manager.findBy(TaskOutput, {job});
   }
 }

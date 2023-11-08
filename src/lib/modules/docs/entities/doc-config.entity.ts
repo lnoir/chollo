@@ -13,7 +13,7 @@ export class DocConfig {
   selector: string;
 
   @Column({nullable: true, type: "json"})
-  map: Record<string, any>;
+  map: Record<string, any>[];
 
   @Column()
   js: boolean;

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsString, IsOptional, IsBoolean, IsObject } from 'class-validator';
+import { IsEnum, IsString, IsOptional, IsBoolean, IsObject, IsArray } from 'class-validator';
+import { PropertySelectorMap } from '../docs.types';
 
 export class DocConfigInDto {
   @ApiPropertyOptional({
@@ -25,8 +26,8 @@ export class DocConfigInDto {
     type: "object",
   })
   @IsOptional()
-  @IsObject()
-  map?: Record<string, any>;
+  @IsArray()
+  map?: PropertySelectorMap[];
 
   @ApiProperty({
     description: 'Indicates if JavaScript is enabled',
